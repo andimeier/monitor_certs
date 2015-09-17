@@ -1,9 +1,13 @@
 #!/bin/bash
 
 TMP_DIR=/tmp
-APACHE_DIR=/etc/apache2/ssl
 
-WHAT=$1
+CRT=$1
+
+CERT_DIR=$( dirname $CRT )
+CERT_NAME=$( basename $CRT )
+CERT_BASE_NAME=${CERT_NAME%.*} # cut away extension
+CERT_EXTENSION=${CERT_NAME##*.} # remember extension
 
 
 function printUsage() {
@@ -11,17 +15,16 @@ function printUsage() {
 	echo "  create_new_CSR.sh WHAT"
 	echo
 	echo "Parameters:"
-	echo "  WHAT ... generate cert for what, can be one of:"
-	echo "           eck-zimmer, owncloud, timetracker, reminder"
+	echo "  WHAT ... CRT (or PEM) file to be newly generated"
 }
 
 
-if [ "$WHAT" == "" ] ; then
+if [ "$CRT" == "" ] ; then
 	printUsage
 	exit 1
 fi
 
-case $WHAT in
+case $CRT in
 	eck-zimmer)
 		keyname=eck-zimmer.at
 		cn=eck-zimmer.at
@@ -50,7 +53,7 @@ esac
 
 keyfile=${TMP_DIR}/${keyname}.key
 csrfile=${TMP_DIR}/${keyname}.csr
-crtfile=${APACHE_DIR}/${keyname}.crt
+crtfile=${CERT_DIR}/${keyname}.crt
 
 openssl req -nodes -newkey rsa:2048 -nodes -keyout $keyfile -out $csrfile -subj "/C=AT/ST=Styria/L=Graz/O=Alexander Eck-Zimmer/CN=${cn}"
 chmod 600 $keyfile
@@ -72,8 +75,8 @@ To do:\n
 or:\n
 $CSR
 \n
-  (3) Put keyfile into ${APACHE_DIR}:\n
-  mv ${keyfile} ${APACHE_DIR}/\n
+  (3) Put keyfile into ${CERT_DIR}:\n
+  mv ${keyfile} ${CERT_DIR}/\n
 \n
   (4) ensure that the key file is fmode 600\n
 \n

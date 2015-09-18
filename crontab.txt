@@ -1,2 +1,2 @@
 # m h  dom mon dow   command
-12      5       *       *       0,3     /eig/bin/check_certs.sh /etc/apache2/ssl/*.crt
+12      5       *       *       0,3     /eig/bin/check_certs.sh --request /etc/apache2/ssl/*.crt
